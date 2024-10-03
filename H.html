@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Type Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #4cae4c;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plant Type Prediction</h1>
+
+    <div class="form-container">
+        <label for="soil_temp">Soil Temperature (°C):</label>
+        <input type="number" id="soil_temp" name="soil_temp" placeholder="Enter soil temperature">
+
+        <label for="soil_ph">Soil pH:</label>
+        <input type="number" id="soil_ph" name="soil_ph" step="0.1" placeholder="Enter soil pH">
+
+        <button id="predictBtn">Predict Plant Type</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("predictBtn").addEventListener("click", function() {
+            // Get values from input fields
+            const soilTemp = document.getElementById("soil_temp").value;
+            const soilPh = document.getElementById("soil_ph").value;
+
+            // Prepare the data to be sent in the request
+            const data = {
+                "soil_temp": parseFloat(soilTemp),
+                "soil_ph": parseFloat(soilPh)
+            };
+
+            // Send POST request to the API
+            fetch('http://127.0.0.1:8000/api/predict_plant_type/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the prediction result
+                document.getElementById("result").innerHTML = 
+                    "Predicted Plant Type: " + data.predicted_plant_type;
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById("result").innerHTML = "Error predicting plant type.";
+            });
+        });
+    </script>
+</body>
+</html>
